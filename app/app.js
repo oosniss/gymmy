@@ -1,0 +1,1 @@
+angular.module("mindTree", ["treeCtrl", "treeSrvs", "cfp.hotkeys"]);
