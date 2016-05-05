@@ -23,10 +23,14 @@
                 <input type="text" placeholder="Enter Your Topic to Get Started!" ng-model="topic">
             </form>
         </div>-->
+        <form ng-submit="setTopic()">
+            <label>Start Brain Storming!!</label>
+            <input type="text" class="mousetrap" placeholder="Enter Your Topic to Get Started!" ng-model="topic">
+        </form>
         <div class="initiated"> <!--ng-show="initialized"-->
-            <h3>Current Topic: {{currentNode}}</h3>
+            <h3>Current Topic: {{node.head}}</h3>
             <form ng-submit="insertTopic()">
-                <input type="text" class="mousetrap" placeholder="Enter Your Topic" ng-model="topic2">
+                <input type="text" class="mousetrap" placeholder="Enter Your Topic" ng-model="children">
             </form>
             <div class="chart" id="tree"></div>
         </div>
@@ -36,6 +40,7 @@
     <script src="https://code.angularjs.org/1.5.3/angular.min.js"></script>
     <script>window.angular || document.write('<script src="assets/js/vendors/angular.min.js"><\/script><script src="assets/js/vendors/angular-cookies.min.js"><\/script>');</script>
     <script src="https://code.angularjs.org/1.5.3/angular-cookies.min.js"></script>
+    <script src="assets/js/vendors/lodash.min.js"></script>
     <script src="assets/js/vendors/treant/Treant.js"></script>
     <script src="assets/js/vendors/treant/vendor/raphael.js"></script>
     <script src="assets/js/vendors/treant/vendor/jquery.easing.js"></script>
@@ -43,6 +48,7 @@
     <script src="app/app.js"></script>
     <script src="app/controllers/treeCtrl.js"></script>
     <script src="app/services/treeSrvs.js"></script>
+    <script src="app/services/navigate.js"></script>
     <script src="//localhost:35729/livereload.js"></script>
 </body>
 </html>

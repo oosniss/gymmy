@@ -1,181 +1,175 @@
 angular.module("treeCtrl", [])
-    .controller("treeController", ["$scope", "$timeout", "hotkeys", function ($scope, $timeout, hotkeys) {
+    .constant('_', window._)
+    .run(function ($rootScope) {
+        $rootScope._ = window._;
+    })
+    .controller("treeController", ["$scope", "$timeout", "hotkeys", "treeServices", "navigate", function ($scope, $timeout, hotkeys, treeServices, navigate) {
 
-        $scope.chart_config = {
-            chart: {
-                container: "#tree",
-                rootOrientation: "NORTH",
-                nodeAlign: "BOTTOM",
-                node: {
-                    HTMLclass: "big-commpany",
-                    collapsable: true
-                },
-                connectors: {
-                    type: "step"
-                },
-                animation: {
-                    nodeAnimation: "easeOutBounce",
-                    nodeSpeed: 700,
-                    connectorsAnimation: "bounce",
-                    connectorsSpeed: 700
-                }
-            },
-            nodeStructure: {
-                text: {
-                    name: "CEO"
-                },
-                children: [
-                    {
-                        text: {name: "Account"},
-                        children: [
-                            {
-                                text: {name: "Receptionist"}
-                            },
-                            {
-                                text: {name: "Author"}
-                            }
-                        ]
-                    },
-                    {
-                        text: {name: "Operation Manager"},
-                        children: [
-                            {
-                                text: {name: "Manager I"},
-                                children: [
-                                    {
-                                        text: {name: "Worker I"},
-                                        children: [
-                                            {
-                                                text: {name: "Worker II"}
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        text: {name: "Worker III"}
-                                    }
-                                ]
-                            },
-                            {
-                                text: {name: "Manager II"},
-                                children: [
-                                    {
-                                        text: {name: "Worker I"}
-                                    },
-                                    {
-                                        text: {name: "Worker II"}
-                                    }
-                                ]
-                            },
-                            {
-                                text: {name: "Manager III"},
-                                children: [
-                                    {
-                                        text: {name: "Worker I"}
-                                    },
-                                    {
-                                        text: {name: "Worker II"}
-                                    },
-                                    {
-                                        text: {name: "Worker III"}
-                                    },
-                                    {
-                                        text: {name: "Worker IV"}
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        text: {name: "Delivery"},
-                        children: [
-                            {
-                                text: {name: "Driver I"}
-                            },
-                            {
-                                text: {name: "Driver II"}
-                            },
-                            {
-                                text: {name: "Driver III"}
-                            }
-                        ]
-                    }
-                ]
+        // set the top node of the tree
+        $scope.setTopic = function () {
+            treeServices.init(this.topic);
+            $scope.node.head = this.topic;
+        };
+
+        // add topic branches to the tree
+        $scope.insertTopic = function () {
+            treeServices.push(this.children);
+        };
+
+        // bind the tree to the view
+        $scope.$watch(function () {
+            if ($scope.chart) {
+                $scope.chart.destroy();
             }
-        };
+            $scope.chart_config = treeServices.tree();
+            $scope.chart = new Treant($scope.chart_config);
+        });
 
-        $scope.currentNode;
+        // keep track of tree navigation
         $scope.node = {
-            level: 0,
-            depth: 0
+            head: null,
+            depth: 0,
+            there: false,
+            current: ["text", "name"],
+            next: []
         };
 
+        // go down one node
         hotkeys.add({
             combo: 'shift+down',
-            description: 'This one goes to 11',
             callback: function() {
-                if ($scope.node.level == 0) {
-                    $scope.currentNode = $scope.chart_config.nodeStructure.children[0].text.name;
-                    $scope.node.level++;
-                } else if ($scope.node.level > 0) {
-                    $scope.currentNode = $scope.chart_config.nodeStructure.children[0].children[0].text.name;
 
+                if ($scope.node.depth > 0) {
+                    $scope.node.there = false;
                 }
+
+                // go down the node by one level, so that it navigates to the first children in the node
+                $scope.node.depth = 0;
+
+                var target = $scope.chart_config.nodeStructure;
+
+                // push "children", 0 to the current node array
+                $scope.node.current.splice($scope.node.current.length-2, 0, "children", $scope.node.depth);
+
+                // generate a new array to check if the next node exists
+                // copy the current node array
+                var nextSrc = _.take($scope.node.current, $scope.node.current.length);
+                // add one more "children", 0 to the array
+                nextSrc.splice(nextSrc.length-2, 0, "children", $scope.node.depth);
+                $scope.node.next = nextSrc;
+
+                // if the next node does not exist, reset the current and next nodes to the previous values
+                if ($scope.node.there) {
+                    $scope.node.current.splice($scope.node.current.length-4, 2);
+                    $scope.node.next.splice($scope.node.current.next-4, 2);
+                // if the next nodes exists, update the value to true
+                } else if (!_.has(target, $scope.node.next)) {
+                    $scope.node.there = true;
+                }
+
+                // update the view
+                $scope.node.head = _.get(target, $scope.node.current);
+
+                console.log($scope.node.current);
+                console.log($scope.node.next);
 
             }
         });
+
         hotkeys.add({
             combo: 'shift+up',
-            description: 'This one goes to 11',
             callback: function() {
-                $scope.nodeLevel--;
+
+                $scope.node.depth = 0;
+
+                var target = $scope.chart_config.nodeStructure;
+
+                if ($scope.node.current.length > 2) {
+                    $scope.node.current.splice($scope.node.current.length-4, 2);
+                    if ($scope.node.next.length > 2) {
+                        var nextSrc = _.take($scope.node.current, $scope.node.current.length);
+                        nextSrc.splice(nextSrc.length-4, 2);
+                        $scope.node.next = nextSrc;
+                    }
+                }
+
+                if (_.has(target, $scope.node.next)) {
+                    $scope.node.there = false;
+                }
+
+                $scope.node.head = _.get(target, $scope.node.current);
+
+                console.log($scope.node.current);
+                console.log($scope.node.next);
+            }
+        });
+
+        hotkeys.add({
+            combo: 'shift+right',
+            callback: function() {
+
+                var target = $scope.chart_config.nodeStructure;
+
+                if ($scope.node.current.length >= 4) {
+                    if ($scope.node.depth == 0) {
+                        console.log("POWER");
+                        $scope.node.there = false;
+                    }
+                    $scope.node.depth++;
+                    $scope.node.current.splice($scope.node.current.length-3, 1, $scope.node.depth);
+
+                    var nextSrc = _.take($scope.node.current, $scope.node.current.length);
+                    nextSrc.splice(nextSrc.length-3, 1, $scope.node.depth+1);
+                    $scope.node.next = nextSrc;
+
+                    if ($scope.node.there) {
+                        $scope.node.depth--;
+                        $scope.node.current.splice($scope.node.current.length-3, 1, $scope.node.depth);
+                        $scope.node.next.splice($scope.node.next.length-3, 1, $scope.node.depth+1);
+                        console.log("THERE");
+                        console.log($scope.node.current);
+                        console.log($scope.node.next);
+                    }
+
+                    if (!_.has(target, $scope.node.next)) {
+                        $scope.node.there = true;
+                    }
+
+                    $scope.node.head = _.get(target, $scope.node.current);
+
+                    console.log($scope.node.current);
+                    console.log($scope.node.next);
+                }
             }
         });
         hotkeys.add({
             combo: 'shift+left',
-            description: 'This one goes to 11',
             callback: function() {
-                $scope.currentNode -= 1;
-            }
-        });
-        hotkeys.add({
-            combo: 'shift+right',
-            description: 'This one goes to 11',
-            callback: function() {
-                $scope.currentNode -= 1;
-            }
-        });
 
-        if ($scope.chart_config.nodeStructure.text.name.children) {
+                var target = $scope.chart_config.nodeStructure;
 
-        }
+                $scope.node.depth--;
+                if ($scope.node.depth >= 0) {
+                    $scope.node.current.splice($scope.node.current.length-3, 1, $scope.node.depth);
+                    var nextSrc = _.take($scope.node.current, $scope.node.current.length);
+                    if ($scope.node.depth == 0) {
+                        nextSrc.splice(nextSrc.length-3, 1, $scope.node.depth);
+                    } else {
+                        nextSrc.splice(nextSrc.length-3, 1, $scope.node.depth-1);
+                    }
 
-        $scope.initialized = false;
-
-        $scope.$watch(function () {
-            //$scope.currentNode = $scope.chart_config.nodeStructure.text.name;
-        });
-
-        $scope.currentNode = $scope.chart_config.nodeStructure.text.name;
-        $scope.chart = new Treant($scope.chart_config);
-
-        $scope.setTopic = function () {
-            if (this.topic !== undefined) {
-                $scope.chart_config.nodeStructure.text.name = this.topic;
-                $timeout(function () {
-                    $scope.chart = new Treant($scope.chart_config);
-                });
-                $scope.currentNode = this.topic;
-                $scope.initialized = true;
-            }
-        };
-        $scope.insertTopic = function () {
-            $scope.chart_config.nodeStructure.children[2].children.push({
-                text: {
-                    name: this.topic2
+                    $scope.node.next = nextSrc;
                 }
-            });
-            $scope.chart.destroy();
-            $scope.chart = new Treant($scope.chart_config);
-        };
+
+                if (_.has(target, $scope.node.next)) {
+                    $scope.node.there = false;
+                }
+
+                $scope.node.head = _.get(target, $scope.node.current);
+
+                console.log($scope.node.current);
+                console.log($scope.node.next);
+            }
+        });
 
     }]);
