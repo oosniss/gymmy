@@ -3,27 +3,62 @@ angular.module("treeCtrl", [])
     .run(function ($rootScope) {
         $rootScope._ = window._;
     })
-    .controller("treeController", ["$scope", "$timeout", "hotkeys", "treeServices", "navigate", function ($scope, $timeout, hotkeys, treeServices, navigate) {
+    .controller("treeController", ["$scope", "hotkeys", "treeServices", function ($scope, hotkeys, treeServices) {
 
-        // set the top node of the tree
+        // set the main topic of the tree
         $scope.setTopic = function () {
             treeServices.init(this.topic);
             $scope.node.head = this.topic;
         };
 
-        // add topic branches to the tree
+        // add branches to the tree
         $scope.insertTopic = function () {
-            treeServices.push(this.children);
+            treeServices.push(this.children, $scope.node.insertAt);
         };
 
         // bind the tree to the view
         $scope.$watch(function () {
+
+            // automatically update the tree
             if ($scope.chart) {
                 $scope.chart.destroy();
             }
             $scope.chart_config = treeServices.tree();
             $scope.chart = new Treant($scope.chart_config);
+
+            // update the view when the current topic changes
+            $scope.node.head = _.get($scope.chart_config.nodeStructure, $scope.node.current);
+
+            // keep track of the current node to insert a new branch
+            if ($scope.node.current.length >= 4) {
+                var insertSrc = _.take($scope.node.current, $scope.node.current.length-2);
+                insertSrc.push("children");
+                $scope.node.insertAt = insertSrc;
+            } else {
+                $scope.node.insertAt = "children";
+            }
+
+            var target = angular.element('.nodeBranches');
+            for (var i = 0; i < target.length; i++) {
+                var id = target.eq(i).attr("id");
+                target.eq(i).attr("ng-class")
+            }
+
+            (function () {
+                var target = angular.element(".nodeBranches");
+                for (var i = 0; i < target.length; i++) {
+                    var id = target.eq(i).attr("id");
+                    var attr = "changeClass('" + id + "')";
+                    target.eq(i).attr("ng-class", attr);
+                }
+            })();
         });
+
+        $scope.currentNode = "nodeTop";
+
+        $scope.changeClass = function (newValue) {
+            return $scope.currentNode == newValue ? "active" : "";
+        };
 
         // keep track of tree navigation
         $scope.node = {
@@ -31,47 +66,71 @@ angular.module("treeCtrl", [])
             depth: 0,
             there: false,
             current: ["text", "name"],
-            next: []
+            next: ["children", 0, "text", "name"],
+            direction: null,
+            insertAt: "children"
         };
+
+        function resetDirc (direction) {
+            if ($scope.node.direction !== direction) {
+                $scope.node.there = false;
+                $scope.node.direction = direction;
+            }
+        }
+        function checkNext (trg, src) {
+            if (!_.has(trg, src)) {
+                $scope.node.there = true;
+            }
+        }
 
         // go down one node
         hotkeys.add({
             combo: 'shift+down',
             callback: function() {
+                resetDirc("down");
 
                 if ($scope.node.depth > 0) {
                     $scope.node.there = false;
                 }
-
-                // go down the node by one level, so that it navigates to the first children in the node
                 $scope.node.depth = 0;
 
-                var target = $scope.chart_config.nodeStructure;
+                if ($scope.node.current.length == 2) {
+                    var test = _.take($scope.node.current, 2);
+                    test.splice(0, 0, "children", 0);
+                    if (_.has($scope.chart_config.nodeStructure, test)) {
+                        $scope.node.current.splice($scope.node.current.length-2, 0, "children", $scope.node.depth);
 
-                // push "children", 0 to the current node array
-                $scope.node.current.splice($scope.node.current.length-2, 0, "children", $scope.node.depth);
+                        var nextSrc = _.take($scope.node.current, $scope.node.current.length);
+                        nextSrc.splice(nextSrc.length-2, 0, "children", $scope.node.depth);
+                        $scope.node.next = nextSrc;
+                        console.log($scope.node.there);
 
-                // generate a new array to check if the next node exists
-                // copy the current node array
-                var nextSrc = _.take($scope.node.current, $scope.node.current.length);
-                // add one more "children", 0 to the array
-                nextSrc.splice(nextSrc.length-2, 0, "children", $scope.node.depth);
-                $scope.node.next = nextSrc;
+                        if ($scope.node.there) {
+                            $scope.node.current.splice($scope.node.current.length-4, 2);
+                            $scope.node.next.splice($scope.node.current.next-4, 2);
+                        }
 
-                // if the next node does not exist, reset the current and next nodes to the previous values
-                if ($scope.node.there) {
-                    $scope.node.current.splice($scope.node.current.length-4, 2);
-                    $scope.node.next.splice($scope.node.current.next-4, 2);
-                // if the next nodes exists, update the value to true
-                } else if (!_.has(target, $scope.node.next)) {
-                    $scope.node.there = true;
+                    }
+                } else {
+                    console.log("GODOWN");
+                    $scope.node.current.splice($scope.node.current.length-2, 0, "children", $scope.node.depth);
+
+                    var nextSrc = _.take($scope.node.current, $scope.node.current.length);
+                    nextSrc.splice(nextSrc.length-2, 0, "children", $scope.node.depth);
+                    $scope.node.next = nextSrc;
+                    console.log($scope.node.there);
+
+                    if ($scope.node.there) {
+                        $scope.node.current.splice($scope.node.current.length-4, 2);
+                        $scope.node.next.splice($scope.node.current.next-4, 2);
+                    }
                 }
 
-                // update the view
-                $scope.node.head = _.get(target, $scope.node.current);
+                checkNext($scope.chart_config.nodeStructure, $scope.node.next);
 
                 console.log($scope.node.current);
                 console.log($scope.node.next);
+                console.log($scope.node.there);
 
             }
         });
@@ -79,10 +138,7 @@ angular.module("treeCtrl", [])
         hotkeys.add({
             combo: 'shift+up',
             callback: function() {
-
-                $scope.node.depth = 0;
-
-                var target = $scope.chart_config.nodeStructure;
+                resetDirc("up");
 
                 if ($scope.node.current.length > 2) {
                     $scope.node.current.splice($scope.node.current.length-4, 2);
@@ -91,28 +147,24 @@ angular.module("treeCtrl", [])
                         nextSrc.splice(nextSrc.length-4, 2);
                         $scope.node.next = nextSrc;
                     }
+                    $scope.node.depth = $scope.node.current[$scope.node.current.length - 3];
                 }
 
-                if (_.has(target, $scope.node.next)) {
-                    $scope.node.there = false;
-                }
-
-                $scope.node.head = _.get(target, $scope.node.current);
+                checkNext($scope.chart_config.nodeStructure, $scope.node.next);
 
                 console.log($scope.node.current);
                 console.log($scope.node.next);
+                console.log($scope.node.there);
             }
         });
 
         hotkeys.add({
             combo: 'shift+right',
             callback: function() {
-
-                var target = $scope.chart_config.nodeStructure;
+                resetDirc("right");
 
                 if ($scope.node.current.length >= 4) {
                     if ($scope.node.depth == 0) {
-                        console.log("POWER");
                         $scope.node.there = false;
                     }
                     $scope.node.depth++;
@@ -126,30 +178,29 @@ angular.module("treeCtrl", [])
                         $scope.node.depth--;
                         $scope.node.current.splice($scope.node.current.length-3, 1, $scope.node.depth);
                         $scope.node.next.splice($scope.node.next.length-3, 1, $scope.node.depth+1);
-                        console.log("THERE");
-                        console.log($scope.node.current);
-                        console.log($scope.node.next);
                     }
 
-                    if (!_.has(target, $scope.node.next)) {
-                        $scope.node.there = true;
-                    }
-
-                    $scope.node.head = _.get(target, $scope.node.current);
-
+                    checkNext($scope.chart_config.nodeStructure, $scope.node.next);
                     console.log($scope.node.current);
                     console.log($scope.node.next);
+                    console.log($scope.node.there);
                 }
             }
         });
         hotkeys.add({
             combo: 'shift+left',
             callback: function() {
+                console.log($scope.node.current);
+                console.log($scope.node.next);
+                console.log($scope.node.there);
 
-                var target = $scope.chart_config.nodeStructure;
 
-                $scope.node.depth--;
-                if ($scope.node.depth >= 0) {
+                resetDirc("left");
+
+                if ($scope.node.depth > 0) {
+                    $scope.node.depth--;
+                }
+                if ($scope.node.depth >= 0 && $scope.node.current.length >= 4) {
                     $scope.node.current.splice($scope.node.current.length-3, 1, $scope.node.depth);
                     var nextSrc = _.take($scope.node.current, $scope.node.current.length);
                     if ($scope.node.depth == 0) {
@@ -161,14 +212,10 @@ angular.module("treeCtrl", [])
                     $scope.node.next = nextSrc;
                 }
 
-                if (_.has(target, $scope.node.next)) {
-                    $scope.node.there = false;
-                }
-
-                $scope.node.head = _.get(target, $scope.node.current);
-
+                checkNext($scope.chart_config.nodeStructure, $scope.node.next);
                 console.log($scope.node.current);
                 console.log($scope.node.next);
+                console.log($scope.node.there);
             }
         });
 

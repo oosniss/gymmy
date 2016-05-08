@@ -70,11 +70,11 @@ body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,
     border-radius: 3px;
 }
 
-.node {
-    font-size: 11px;
+.node#nodeTop {
+    border: 2px solid red;
 }
 
-.node.big-commpany {
+.node.nodeBranches {
     cursor: pointer;
     padding: 0 2px;
     min-width: 60px;
@@ -85,13 +85,13 @@ body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,
     box-shadow: 1px 1px 1px rgba(0,0,0,.5);
     background: #fff;
 }
-.node.big-commpany:active {
+.node.nodeBranches:active {
     box-shadow: inset 1px 1px 1px rgba(0,0,0,.1);
     margin: 1px 0 0 1px;
     border: 2px solid #D3D3CB;
 }
 
-.node.big-commpany .node-name {
+.node.nodeBranches .node-name {
     line-height: 30px;
     color: #9B9B9B;
 }
@@ -107,7 +107,7 @@ body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,
         }
     }
 }
-.node.big-commpany:hover .node-name {
+.node.nodeBranches:hover .node-name {
     color: #8B8B8B;
     text-shadow: 1px 1px rgba(0,0,0,.15);
 }

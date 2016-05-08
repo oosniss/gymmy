@@ -11,7 +11,7 @@ angular.module("treeSrvs", [])
                 rootOrientation: "NORTH",
                 nodeAlign: "BOTTOM",
                 node: {
-                    HTMLclass: "big-commpany",
+                    HTMLclass: "nodeBranches",
                     collapsable: true
                 },
                 connectors: {
@@ -28,6 +28,7 @@ angular.module("treeSrvs", [])
                 text: {
                     name: "CEO"
                 },
+                HTMLid: "nodeTop",
                 children: [
                     {
                         text: {name: "Account"},
@@ -99,11 +100,12 @@ angular.module("treeSrvs", [])
                                 text: {name: "Driver II"}
                             },
                             {
-                                text: {name: "Driver III"}
+                                text: {name: "Driver III"},
+                                children: []
                             }
                         ]
                     }
-                ]
+                 ]
             }
         };
 
@@ -117,11 +119,16 @@ angular.module("treeSrvs", [])
             }
         };
 
-        this.push = function (topic) {
-            tree.nodeStructure.children[2].children.push({
+        this.push = function (topic, insertAt) {
+            var pushTo = _.get(tree.nodeStructure, insertAt);
+
+            pushTo.push({
                 text: {
                     name: topic
-                }
-            })
-        }
+                },
+                HTMLid: _.join(insertAt, ".") + "." + pushTo.length,
+                children: []
+            });
+        };
+
     });
