@@ -127,11 +127,6 @@ angular.module("treeCtrl", [])
                 }
 
                 checkNext($scope.chart_config.nodeStructure, $scope.node.next);
-
-                console.log($scope.node.current);
-                console.log($scope.node.next);
-                console.log($scope.node.there);
-
             }
         });
 
@@ -151,10 +146,6 @@ angular.module("treeCtrl", [])
                 }
 
                 checkNext($scope.chart_config.nodeStructure, $scope.node.next);
-
-                console.log($scope.node.current);
-                console.log($scope.node.next);
-                console.log($scope.node.there);
             }
         });
 
@@ -181,19 +172,12 @@ angular.module("treeCtrl", [])
                     }
 
                     checkNext($scope.chart_config.nodeStructure, $scope.node.next);
-                    console.log($scope.node.current);
-                    console.log($scope.node.next);
-                    console.log($scope.node.there);
                 }
             }
         });
         hotkeys.add({
             combo: 'shift+left',
             callback: function() {
-                console.log($scope.node.current);
-                console.log($scope.node.next);
-                console.log($scope.node.there);
-
 
                 resetDirc("left");
 
@@ -213,9 +197,6 @@ angular.module("treeCtrl", [])
                 }
 
                 checkNext($scope.chart_config.nodeStructure, $scope.node.next);
-                console.log($scope.node.current);
-                console.log($scope.node.next);
-                console.log($scope.node.there);
             }
         });
 
