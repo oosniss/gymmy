@@ -22,34 +22,102 @@
     <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/base-min.css">
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/js/vendors/treant/Treant.css">
     <link rel="stylesheet" href="assets/js/vendors/treant/vendor/perfect-scrollbar/perfect-scrollbar.css">
     <link rel="stylesheet" href="assets/css/vendors/hotkeys.min.css">
     <link rel="stylesheet" href="assets/css/main.css">
 </head>
-<body ng-controller="treeController" ng-cloak>
+<body ng-controller="treeController" ng-init="init()" ng-cloak>
+    <div class="init" ng-show="!node.initialized">
+        <form ng-submit="setTopic()">
+            <label>Start Brain Storming!!</label>
+            <input type="text" placeholder="Enter Your Topic to Get Started!" ng-model="topic">
+        </form>
+    </div>
     <header>
         <h1>Mind<i class="fa fa-tree" aria-hidden="true"></i>Tree</h1>
     </header>
-    <main><!--
-        <div class="init" ng-show="!initialized">
-            <form ng-submit="setTopic()">
-                <label>Start Brain Storming!!</label>
-                <input type="text" placeholder="Enter Your Topic to Get Started!" ng-model="topic">
-            </form>
-        </div>-->
-        <form ng-submit="setTopic()">
-            <label>Start Brain Storming!!</label>
-            <input type="text" class="mousetrap" placeholder="Enter Your Topic to Get Started!" ng-model="topic">
-        </form>
-        <div class="initiated"> <!--ng-show="initialized"-->
-            <h3>Current Topic: {{node.head}}</h3>
-            <form ng-submit="insertTopic()">
-                <input type="text" class="mousetrap" placeholder="Enter Your Topic" ng-model="children">
-            </form>
-            <div class="chart" id="tree"></div>
+    <aside>
+        <div class="pure-g instructions">
+            <div class="pure-u-6-24">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="key">
+                                <img src="assets/img/shift.png" alt="Move Left">
+                                <img src="assets/img/cursor-left.png" alt="Move Left">
+                            </td>
+                            <td class="txt">Move Left</td>
+                        </tr>
+                        <tr>
+                            <td class="key">
+                                <img src="assets/img/shift.png" alt="Move Up">
+                                <img src="assets/img/cursor-up.png" alt="Move Up">
+                            </td>
+                            <td class="txt">Move Up</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pure-u-6-24">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="key">
+                                <img src="assets/img/shift.png" alt="Move Right">
+                                <img src="assets/img/cursor-right.png" alt="Move Right">
+                            </td>
+                            <td class="txt">Move Right</td>
+                        </tr>
+                        <tr>
+                            <td class="key">
+                                <img src="assets/img/shift.png" alt="Move Down">
+                                <img src="assets/img/cursor-down.png" alt="Move Down">
+                            </td>
+                            <td class="txt">Move Down</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pure-u-6-24">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="key">
+                                <img src="assets/img/shift.png" alt="Insert New Item">
+                                <img src="assets/img/n.png" alt="Insert New Item">
+                            </td>
+                            <td class="txt">Insert New Item</td>
+                        </tr>
+                        <tr>
+                            <td class="key">
+                                <img src="assets/img/shift.png" alt="Edit Current Item">
+                                <img src="assets/img/e.png" alt="Edit Current Item">
+                            </td>
+                            <td class="txt">Edit Current Item</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pure-u-6-24">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="key">
+                                <img src="assets/img/shift.png" alt="Delete Current Item">
+                                <img src="assets/img/d.png" alt="Delete Current Item">
+                            </td>
+                            <td class="txt">Delete Current Item</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
+    </aside>
+    <main>
+        <div class="chart" id="tree" ng-show="node.initialized"></div>
     </main>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="assets/js/vendors/jquery-1.12.2.min.js"><\/script>');</script>
@@ -64,7 +132,6 @@
     <script src="app/app.js"></script>
     <script src="app/controllers/treeCtrl.js"></script>
     <script src="app/services/treeSrvs.js"></script>
-    <script src="app/services/navigate.js"></script>
     <script src="//localhost:35729/livereload.js"></script>
 </body>
 </html>

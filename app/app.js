@@ -1,1 +1,1 @@
-angular.module("mindTree", ["treeCtrl", "treeSrvs", "navigateTree", "cfp.hotkeys"]);
+angular.module("mindTree", ["treeCtrl", "treeSrvs", "cfp.hotkeys"]);

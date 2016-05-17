@@ -1,31 +1,48 @@
-@import url(https://fonts.googleapis.com/css?family=Cinzel);
+@import url(https://fonts.googleapis.com/css?family=Cinzel:400,700,900);
 @import "variables";
-@import "animation";
 * {
     box-sizing: border-box;
 }
 body {
-    font-size: 16px;
     background: $lessdark;
-    form {
-        color: $brightest;
-        font-family: 'Cinzel', serif;
-        input {
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid $brightest;
-            height: 40px;
-            padding-bottom: 5px;
-            width: 70%;
-        }
-        input:focus {
-            outline-width: 0;
-        }
-    }
+    color: $darkest;
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
 }
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6, p {
     margin: 0;
     padding: 0;
+}
+
+.init {
+    background: $darkest;
+    padding-top: 200px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 99;
+    form {
+        text-align: center;
+        label {
+            color: #ffffff;
+            display: block;
+            font-weight: 900;
+            font-size: 4.5em;
+            margin-bottom: 100px;
+        }
+        input {
+            background: $brightest;
+            padding: 10px;
+            text-align: center;
+            border: none;
+            height: 100px;
+            width: 60%;
+            font-size: 3em;
+            &:focus {
+                outline-width: 0;
+            }
+        }
+    }
 }
 header {
     background-color: $darkest;
@@ -35,79 +52,83 @@ header {
     h1 {
         font-family: 'Cinzel', serif;
         font-size: 4em;
+        font-weight: 900;
         i {
-            margin: 0 15px;
+            margin: 0 25px;
+        }
+    }
+}
+aside {
+    background: $brightest;
+    div.instructions {
+        margin: 0 auto;
+        padding: 10px;
+        table {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin: 0 auto;
+            width: 80%;
+            .key {
+                width: 70%;
+            }
+            .txt {
+                width: 30%;
+            }
+            img {
+                height: 50px;
+            }
         }
     }
 }
 main {
-    .init {
-        padding-top: 200px;
-        form {
-            text-align: center;
-            label {
-                display: block;
-                font-size: 3.5em;
-                margin-bottom: 100px;
+    padding: 10px;
+    .chart {
+        background: #ffffff;
+        height: 70vh;
+        #nodeTop {
+            font-size: 1.5em;
+        }
+        .node.nodeBranches {
+            background: $brightest;
+            border: 5px solid $brightest;
+            border-radius: 2px;
+            box-shadow: 2.5px 2.5px 2.5px rgba($darkest, 0.5);
+            cursor: pointer;
+            &:hover .node-name {
+                color: $darkest;
+                font-weight: 700;
+                text-shadow: 2.5px 2.5px 2.5px rgba($darkest, 0.15);
             }
-            input {
-                font-size: 2.25em;
-                width: 60%;
+            .node-name {
+                padding: 7.5px;
+            }
+            .collapse-switch {
+                border: none;
+                width: 100%;
+                height: 100%;
+            }
+            .editNode {
                 text-align: center;
+                background: transparent;
+                border: none;
+                height: 40px;
+                &:focus {
+                    outline-width: 0;
+                }
+            }
+        }
+        .collapsed {
+            .collapse-switch {
+                background: none;
+            }
+        }
+        .active {
+            border: 5px solid #222B40 !important;
+            .node-name {
+                color: black !important;
+                font-weight: 900 !important;
             }
         }
     }
-}
-body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td {
-    margin:0;
-    padding:0;
-}
-.chart {
-    height: 600px;
-    width: 100%;
-    margin: 15px auto;
-    border: 3px solid #DDD;
-    border-radius: 3px;
-}
-
-.node#nodeTop {
-    border: 2px solid red;
-}
-
-.node.nodeBranches {
-    cursor: pointer;
-    padding: 0 2px;
-    min-width: 60px;
-    text-align: center;
-    height: 30px;
-    border: 2px solid #E8E8E3;
-    border-radius: 2px;
-    box-shadow: 1px 1px 1px rgba(0,0,0,.5);
-    background: #fff;
-}
-.node.nodeBranches:active {
-    box-shadow: inset 1px 1px 1px rgba(0,0,0,.1);
-    margin: 1px 0 0 1px;
-    border: 2px solid #D3D3CB;
-}
-
-.node.nodeBranches .node-name {
-    line-height: 30px;
-    color: #9B9B9B;
-}
-.Treant {
-    .collapse-switch {
-        width: 100%;
-        height: 100%;
-        border: none;
-    }
-    .collapsed {
-        .collapse-switch {
-            background: none;
-        }
-    }
-}
-.node.nodeBranches:hover .node-name {
-    color: #8B8B8B;
-    text-shadow: 1px 1px rgba(0,0,0,.15);
 }
