@@ -9,27 +9,27 @@ angular.module("treeCtrl", [])
         $scope.node = {
             initialized: false,
             depth: 0,
-            there: false,
             current: ["nodeTop"],
-            next: ["children", 0],
-            editAt: null,
-            direction: null,
+            nextCheck: [],
             tempValue: null,
             lastTask: null,
-            classTarget: "nodeTop"
+            classTarget: "nodeTop",
+            mousetrap: true
         };
 
         // create and refresh the tree
         $scope.init = function () {
+            // remove the current tree
             if ($scope.chart) {
                 $scope.chart.destroy();
             }
+            // recreate the tree with updated information
             $scope.chart_config = treeServices.tree();
             $scope.chart = new Treant($scope.chart_config, function () {
+                // attach ngClass directives to the tree items
                 var target = angular.element(".nodeBranches");
                 for (var i = 0; i < target.length; i++) {
-                    var id = target.eq(i).attr("id");
-                    target.eq(i).attr("ng-class", "changeClass('" + id + "')");
+                    target.eq(i).attr("ng-class", "changeClass('" + target.eq(i).attr("id") + "')");
                 }
                 $compile(target)($scope);
             });
@@ -43,148 +43,110 @@ angular.module("treeCtrl", [])
             $scope.node.initialized = true;
         };
 
+        // keep track of class change and editing point
         $scope.$watch(function () {
+            // update the value for ngClass
             $scope.node.classTarget = _.join($scope.node.current, "");
-            $scope.node.editAt = _.take($scope.node.current, $scope.node.current.length);
-            $scope.node.editAt.push("text", "name");
+            // keep track of how deep the current item is
+            $scope.node.depth = $scope.node.current[$scope.node.current.length-1];
         });
 
+        // update the class for each items
         $scope.changeClass = function (newValue) {
             return $scope.node.classTarget == newValue ? "active" : "";
         };
 
-        function resetDirc (direction) {
-            if ($scope.node.direction !== direction) {
-                $scope.node.there = false;
-                $scope.node.direction = direction;
-            }
-        }
-        function checkNext (trg, src) {
-            if (!_.has(trg, src)) {
-                $scope.node.there = true;
-            }
-        }
-
-        // go down one node
+        // go down one level
         hotkeys.add({
-            combo: 'shift+down',
+            combo: 'down',
             callback: function() {
-                resetDirc("down");
-                if ($scope.node.depth > 0) {
-                    $scope.node.there = false;
-                }
+                // always go down to the first item in the next level
                 $scope.node.depth = 0;
+
+                // store the value to check if the tree has the next item
+                var nextCheck = _.take($scope.node.current, $scope.node.current.length);
+
                 if ($scope.node.current[0] == "nodeTop") {
-                    var initCheck = _.take($scope.node.current, $scope.node.current.length);
-                    initCheck.splice(0, 1, "children", $scope.node.depth);
-                    if (_.has($scope.chart_config.nodeStructure, initCheck)) {
-                        console.log("POWER");
-                        $scope.node.current.splice(0, 1, "children", $scope.node.depth);
-                        var next = _.take($scope.node.current, $scope.node.current.length);
-                        next.push("children", $scope.node.depth);
-                        $scope.node.next = next;
-                    }
+                    // if the current item is the top item
+                    nextCheck.splice(0, 1, "children", $scope.node.depth);
                 } else {
-                    $scope.node.current.push("children", $scope.node.depth);
-                    var next2 = _.take($scope.node.current, $scope.node.current.length);
-                    next2.push("children", $scope.node.depth);
-                    $scope.node.next = next2;
-                    if ($scope.node.there) {
-                        $scope.node.current.splice($scope.node.current.length-2, 2);
-                        $scope.node.next.splice($scope.node.next.length-2, 2);
-                    }
+                    nextCheck.push("children", $scope.node.depth);
                 }
-                checkNext($scope.chart_config.nodeStructure, $scope.node.next);
+
+                // if the tree has the next item, move to the next item.
+                if (_.has($scope.chart_config.nodeStructure, nextCheck)) {
+                    $scope.node.current = nextCheck;
+                }
             }
         });
 
+        // go up one level
         hotkeys.add({
-            combo: 'shift+up',
+            combo: 'up',
             callback: function() {
-                resetDirc("up");
-
+                // go up one level only when the top item has children
                 if ($scope.node.current.length > 2) {
-                    console.log("TRUE");
-                    $scope.node.current.splice($scope.node.current.length-2, 2);
-                    var next = _.take($scope.node.current, $scope.node.current.length);
-                    next.splice(next.length-2, 2);
-                    $scope.node.next = next;
+                    $scope.node.current.splice($scope.node.current.length - 2, 2);
                 } else {
+                    // if not, reset to default
                     $scope.node.current = ["nodeTop"];
                     $scope.node.next = ["children", 0];
                 }
-                checkNext($scope.chart_config.nodeStructure, $scope.node.next);
-                console.log($scope.node.current);
-                console.log($scope.node.next);
             }
         });
 
+        // go right one level
         hotkeys.add({
-            combo: 'shift+right',
+            combo: 'right',
             callback: function() {
-                resetDirc("right");
+                // store the value to check if the tree has the next item
+                var nextCheck = _.take($scope.node.current, $scope.node.current.length);
 
+                // go up one level only when the top item has children
                 if ($scope.node.current.length >= 2) {
-                    if ($scope.node.depth == 0) {
-                        $scope.node.there = false;
-                    }
+                    // increment the depth value to move to the next children
                     $scope.node.depth++;
-                    $scope.node.current.splice($scope.node.current.length-1, 1, $scope.node.depth);
-                    var next = _.take($scope.node.current, $scope.node.current.length);
-                    next.splice(next.length-1, 1, $scope.node.depth+1);
-                    $scope.node.next = next;
-                    if ($scope.node.there) {
-                        $scope.node.depth--;
-                        $scope.node.current.splice($scope.node.current.length-1, 1, $scope.node.depth);
-                        $scope.node.next.splice($scope.node.next.length-1, 1, $scope.node.depth+1);
+                    nextCheck.splice(nextCheck.length - 1, 1, $scope.node.depth);
+                    if (_.has($scope.chart_config.nodeStructure, nextCheck)) {
+                        $scope.node.current = nextCheck;
                     }
                 }
-                checkNext($scope.chart_config.nodeStructure, $scope.node.next);
-                console.log($scope.node.current);
-                console.log($scope.node.next);
             }
         });
-        hotkeys.add({
-            combo: 'shift+left',
-            callback: function() {
-                resetDirc("left");
-                if ($scope.node.depth > 0) {
-                    $scope.node.depth--;
-                }
 
-                if ($scope.node.depth >= 0 && $scope.node.current.length >= 2) {
-                    $scope.node.current.splice($scope.node.current.length-1, 1, $scope.node.depth);
-                    var next = _.take($scope.node.current, $scope.node.current.length);
-                    if ($scope.node.depth == 0) {
-                        next.splice(next.length-1, 1, $scope.node.depth);
-                    } else {
-                        next.splice(next.length-1, 1, $scope.node.depth-1);
-                    }
+        // go left one level
+        hotkeys.add({
+            combo: 'left',
+            callback: function() {
+                // move to the previous children
+                // only when the current item is not the first children or the top item
+                if ($scope.node.depth > 0 && $scope.node.current.length >= 2) {
+                    $scope.node.depth--;
+                    $scope.node.current.splice($scope.node.current.length - 1, 1, $scope.node.depth);
                 }
-                checkNext($scope.chart_config.nodeStructure, $scope.node.next);
-                console.log($scope.node.current);
-                console.log($scope.node.next);
             }
         });
         hotkeys.add({
-            combo: "shift+d",
+            combo: "del",
             callback: function () {
-                treeServices.delete(_.take($scope.node.current, $scope.node.current.length-1), $scope.node.current[$scope.node.current.length-1]);
-                $scope.init();
+                // delete the current item and all of its children
+                treeServices.delete(_.take($scope.node.current, $scope.node.current.length - 1), $scope.node.current[$scope.node.current.length - 1]);
+                // refresh the tree and return to the top item
                 $scope.node.current = ["nodeTop"];
                 $scope.node.next = ["children", 0];
+                $scope.init();
             }
         });
 
         // Edit the current node
         hotkeys.add({
-            combo: "shift+e",
+            combo: "e",
             callback: function () {
                 $scope.node.lastTask = "edit";
                 var editField = angular.element(".active");
                 $scope.node.tempValue = editField.children().text();
                 editField.empty();
-                var newField = "<form ng-submit='editNode()'><input class='editNode mousetrap' type='text' ng-model='edited'></form>";
+                var newField = "<form ng-submit='editNode()'><input class='editNode' type='text' ng-model='edited'></form>";
                 editField.append(newField);
                 $timeout(function () {
                     angular.element(".editNode").focus();
@@ -192,49 +154,46 @@ angular.module("treeCtrl", [])
                 $compile(editField)($scope);
             }
         });
-
         $scope.editNode = function () {
-            treeServices.edit($scope.node.editAt, this.edited);
+            treeServices.edit($scope.node.current, this.edited);
             $scope.init();
             this.edited = "";
         };
 
         // Insert a new node for the current node
         hotkeys.add({
-            combo: "shift+n",
+            combo: "n",
             callback: function () {
                 $scope.node.lastTask = "insert";
-                treeServices.push("<form ng-submit='newNode()'><input class='editNode mousetrap' type='text' ng-model='inserted'></form>", $scope.node.current);
+                treeServices.push("<form ng-submit='newNode()'><input class='editNode' type='text' ng-model='inserted'></form>", $scope.node.current);
                 $timeout(function () {
                     angular.element(".editNode").focus();
                 }, 1);
                 $scope.init();
             }
         });
-
         $scope.newNode = function () {
-            treeServices.new($scope.node.current, this.inserted);
+            treeServices.set($scope.node.current, this.inserted);
             $scope.init();
             this.inserted = "";
         };
-
         hotkeys.add({
             combo: "esc",
             callback: function () {
-                if ($scope.node.lastTask == "edit") {
-                    treeServices.edit($scope.node.editAt, $scope.node.tempValue);
-                } else if ($scope.node.lastTask == "insert") {
-                    treeServices.delete(_.take($scope.node.current, $scope.node.current.length-1), $scope.node.current[$scope.node.current.length-1]);
-                    console.log($scope.node.current);
-                    if ($scope.node.current.length == 2) {
-                        $scope.node.current = ["nodeTop"]
-                    } else {
-                        $scope.node.current.splice(-2, 2);
+                if ($scope.node.mousetrap) {
+                    if ($scope.node.lastTask == "edit") {
+                        treeServices.edit($scope.node.current, $scope.node.tempValue);
+                    } else if ($scope.node.lastTask == "insert") {
+                        treeServices.delete(_.take($scope.node.current, $scope.node.current.length-1), $scope.node.current[$scope.node.current.length-1]);
+                        if ($scope.node.current.length == 2) {
+                            $scope.node.current = ["nodeTop"];
+                        } else {
+                            $scope.node.current.splice(-2, 2);
+                        }
                     }
+                    $scope.init();
+                    this.edited = "";
                 }
-                $scope.init();
-                this.edited = "";
             }
         });
-
     }]);
