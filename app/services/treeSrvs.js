@@ -108,7 +108,7 @@ angular.module("treeSrvs", [])
                 innerHTML: form,
                 connectors: {
                     style: {
-                        "stroke": colOptions[Math.floor(Math.random() * colOptions.length-1)]
+                        "stroke": colOptions[Math.floor(Math.random() * (colOptions.length))]
                     }
                 },
                 // unique ID for each item, used for ngClass
