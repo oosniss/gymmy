@@ -108,6 +108,9 @@ module.exports = function(grunt) {
             }
         },
         uglify: {
+            options: {
+                mangle: false
+            },
             my_target: {
                 files: {
                     'assets/js/app.js': ['assets/js/app.js']

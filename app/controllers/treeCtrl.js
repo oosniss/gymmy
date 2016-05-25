@@ -10,7 +10,7 @@ angular.module("treeCtrl", [])
 
         // keep track of tree navigation
         $scope.node = {
-            initialized: true,
+            initialized: false,
             depth: 0,
             current: ["nodeTop"],
             tempValue: null,
