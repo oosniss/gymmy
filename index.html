@@ -30,104 +30,104 @@
     <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body ng-controller="treeController" ng-init="init()" ng-cloak>
-    <div class="init" ng-show="!node.initialized">
-        <form ng-submit="setTopic()">
-            <label>Start Brain Storming!!</label>
-            <input type="text" placeholder="Enter Your Topic to Get Started!" ng-model="topic">
-        </form>
+<div class="init" ng-show="!node.initialized">
+    <form ng-submit="setTopic()">
+        <label>Start Brain Storming!!</label>
+        <input type="text" placeholder="Enter Your Topic to Get Started!" ng-model="topic">
+    </form>
+</div>
+<header>
+    <h1>Mind<i class="fa fa-tree" aria-hidden="true"></i>Tree</h1>
+</header>
+<aside>
+    <div class="pure-g instructions">
+        <div class="pure-u-6-24">
+            <table>
+                <tbody>
+                <tr>
+                    <td class="key">
+                        <img src="assets/img/cursor-left.png" alt="Move Left">
+                    </td>
+                    <td class="txt">Move Left</td>
+                </tr>
+                <tr>
+                    <td class="key">
+                        <img src="assets/img/n.png" alt="Insert New Item">
+                    </td>
+                    <td class="txt">Insert New Item</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pure-u-6-24">
+            <table>
+                <tbody>
+                <tr>
+                    <td class="key">
+                        <img src="assets/img/cursor-up.png" alt="Move Up">
+                    </td>
+                    <td class="txt">Move Up</td>
+                </tr>
+                <tr>
+                    <td class="key">
+                        <img src="assets/img/e.png" alt="Edit Current Item">
+                    </td>
+                    <td class="txt">Edit Current Item</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pure-u-6-24">
+            <table>
+                <tbody>
+                <tr>
+                    <td class="key">
+                        <img src="assets/img/cursor-right.png" alt="Move Right">
+                    </td>
+                    <td class="txt">Move Right</td>
+                </tr>
+                <tr>
+                    <td class="key">
+                        <img src="assets/img/delete.png" alt="Delete Current Item">
+                    </td>
+                    <td class="txt">Delete Current Item</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pure-u-6-24">
+            <table>
+                <tbody>
+                <tr>
+                    <td class="key">
+                        <img src="assets/img/cursor-down.png" alt="Move Down">
+                    </td>
+                    <td class="txt">Move Down</td>
+                </tr>
+                <tr>
+                    <td class="key">
+                        <img src="assets/img/esc.png" alt="Delete Current Item">
+                    </td>
+                    <td class="txt">Cancel</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <header>
-        <h1>Mind<i class="fa fa-tree" aria-hidden="true"></i>Tree</h1>
-    </header>
-    <aside>
-        <div class="pure-g instructions">
-            <div class="pure-u-6-24">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td class="key">
-                                <img src="assets/img/cursor-left.png" alt="Move Left">
-                            </td>
-                            <td class="txt">Move Left</td>
-                        </tr>
-                        <tr>
-                            <td class="key">
-                                <img src="assets/img/n.png" alt="Insert New Item">
-                            </td>
-                            <td class="txt">Insert New Item</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="pure-u-6-24">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td class="key">
-                                <img src="assets/img/cursor-up.png" alt="Move Up">
-                            </td>
-                            <td class="txt">Move Up</td>
-                        </tr>
-                        <tr>
-                            <td class="key">
-                                <img src="assets/img/e.png" alt="Edit Current Item">
-                            </td>
-                            <td class="txt">Edit Current Item</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="pure-u-6-24">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td class="key">
-                                <img src="assets/img/cursor-right.png" alt="Move Right">
-                            </td>
-                            <td class="txt">Move Right</td>
-                        </tr>
-                        <tr>
-                            <td class="key">
-                                <img src="assets/img/delete.png" alt="Delete Current Item">
-                            </td>
-                            <td class="txt">Delete Current Item</td>
-                        </tr>
-                    </tbody>
-                </table>
-        </div>
-            <div class="pure-u-6-24">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td class="key">
-                                <img src="assets/img/cursor-down.png" alt="Move Down">
-                            </td>
-                            <td class="txt">Move Down</td>
-                        </tr>
-                        <tr>
-                            <td class="key">
-                                <img src="assets/img/esc.png" alt="Delete Current Item">
-                            </td>
-                            <td class="txt">Cancel</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </aside>
-    <main>
-        <div class="chart" id="tree" ng-show="node.initialized"></div>
-    </main>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="assets/js/vendors/jquery-1.12.2.min.js"><\/script>');</script>
-    <script src="https://code.angularjs.org/1.5.3/angular.min.js"></script>
-    <script>window.angular || document.write('<script src="assets/js/vendors/angular.min.js"><\/script><script src="assets/js/vendors/angular-cookies.min.js"><\/script>');</script>
-    <script src="https://code.angularjs.org/1.5.3/angular-cookies.min.js"></script>
-    <script src="assets/js/vendors/lodash.min.js"></script>
-    <script src="assets/js/vendors/treant/Treant.js"></script>
-    <script src="assets/js/vendors/treant/vendor/raphael.js"></script>
-    <script src="assets/js/vendors/treant/vendor/jquery.easing.js"></script>
-    <script src="assets/js/vendors/hotkeys.min.js"></script>
-    <script src="assets/js/app.js"></script>
+</aside>
+<main>
+    <div class="chart" id="tree" ng-show="node.initialized"></div>
+</main>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="assets/js/vendors/jquery-1.12.2.min.js"><\/script>');</script>
+<script src="https://code.angularjs.org/1.5.3/angular.min.js"></script>
+<script>window.angular || document.write('<script src="assets/js/vendors/angular.min.js"><\/script><script src="assets/js/vendors/angular-cookies.min.js"><\/script>');</script>
+<script src="https://code.angularjs.org/1.5.3/angular-cookies.min.js"></script>
+<script src="assets/js/vendors/lodash.min.js"></script>
+<script src="assets/js/vendors/treant/Treant.js"></script>
+<script src="assets/js/vendors/treant/vendor/raphael.js"></script>
+<script src="assets/js/vendors/treant/vendor/jquery.easing.js"></script>
+<script src="assets/js/vendors/hotkeys.min.js"></script>
+<script src="assets/js/app.js"></script>
 </body>
 </html>

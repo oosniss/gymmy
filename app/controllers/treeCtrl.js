@@ -99,7 +99,7 @@ angular.module("treeCtrl", [])
                 }
             }
         });
-        
+
         // go up one level
         hotkeys.add({
             combo: 'up',

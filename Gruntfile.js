@@ -108,9 +108,12 @@ module.exports = function(grunt) {
             }
         },
         uglify: {
+<<<<<<< 48a7a1c6826fcf539259eb41e31246d05c7a7d6f
             options: {
                 mangle: false
             },
+=======
+>>>>>>> first commit
             my_target: {
                 files: {
                     'assets/js/app.js': ['assets/js/app.js']
