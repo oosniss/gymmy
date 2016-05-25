@@ -3,7 +3,7 @@ angular.module("treeSrvs", [])
     .run(function ($rootScope) {
         $rootScope._ = window._;
     })
-    .service("treeServices", function () {
+    .service("treeServices", ["$cookies", "$log", function ($cookies, $log) {
 
         // objects for Treant.js
         var tree = {
@@ -29,21 +29,53 @@ angular.module("treeSrvs", [])
                     connectorsSpeed: 700
                 }
             },
-            nodeStructure: {
-                text: {
-                    name: "CEO"
-                },
-                HTMLid: "nodeTop",
-                children: []
-            }
+            nodeStructure: {}
         };
 
-        // values for connector colours
-        var colOptions = ["#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3", "#03A9F4", "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#CDDC39", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#795548", "#9E9E9E", "#607D8B"];
+        // reference for treeServices service
+        var mind = this;
+
+        // tree configurations
+        var config = {
+            initialized: false,
+            colOptions: ["#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3", "#03A9F4", "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#CDDC39", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#795548", "#9E9E9E", "#607D8B"]
+        };
+
+        // checking if the cookie is set
+        (function visitorCheck () {
+            if ($cookies.get("mindTree") === undefined) {
+                $log.info("Welcome!!!");
+                // if not set, create a new cookie
+                $cookies.put("mindTree");
+                tree.nodeStructure = {
+                    text: {
+                        name: "CEO"
+                    },
+                    HTMLid: "nodeTop",
+                    children: []
+                };
+                config.initialized = false;
+            } else if (typeof $cookies.get("mindTree") == "string" && $cookies.get("mindTree").length > 1) {
+                $log.info("Welcome Back!!!");
+                // if set, retrieve the playlist from the cookie
+                tree.nodeStructure = JSON.parse($cookies.get("mindTree"));
+                config.initialized = true;
+            }
+        })();
+        // a new video is added, update the cookie with a new playlist
+        this.updateCookies = function () {
+            var now = new Date();
+            var exp = new Date(now.getFullYear()+1, now.getMonth(), now.getDate());
+            $cookies.put("mindTree", JSON.stringify(tree.nodeStructure), {
+                expires: exp
+            });
+        };
 
         // set the initial value for the top item
         this.init = function (topic) {
             tree.nodeStructure.text.name = topic;
+            config.initialized = true;
+            mind.updateCookies();
         };
 
         // edit the value for the current item
@@ -61,6 +93,7 @@ angular.module("treeSrvs", [])
 
             // set the new value for the target
             _.set(tree.nodeStructure, editAt, value);
+            mind.updateCookies();
         };
 
         // set the new value for the new item
@@ -77,6 +110,7 @@ angular.module("treeSrvs", [])
 
             // update the target so that the class is applied to the current item
             target.splice(target.length-1, 1);
+            mind.updateCookies();
         };
 
         // prepare a form to enter new value for new item
@@ -108,12 +142,13 @@ angular.module("treeSrvs", [])
                 innerHTML: form,
                 connectors: {
                     style: {
-                        "stroke": colOptions[Math.floor(Math.random() * (colOptions.length))]
+                        "stroke": config.colOptions[Math.floor(Math.random() * (config.colOptions.length))]
                     }
                 },
                 // unique ID for each item, used for ngClass
                 HTMLid: _.join(insertAt, "")
             });
+            mind.updateCookies();
         };
 
         // delete current item and all of its children
@@ -121,9 +156,14 @@ angular.module("treeSrvs", [])
             // last item in $scope.node.current will be deleted
             var deleteFrom = _.get(tree.nodeStructure, arr);
             deleteFrom.splice(idx, 1);
+            mind.updateCookies();
         };
 
         this.tree = function () {
             return tree;
         };
-    });
+
+        this.config = function () {
+            return config.initialized;
+        }
+    }]);

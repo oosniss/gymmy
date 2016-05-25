@@ -1,1 +1,1 @@
-angular.module("mindTree", ["treeCtrl", "treeSrvs", "cfp.hotkeys"]);
+angular.module("mindTree", ["ngCookies", "treeCtrl", "treeSrvs", "cfp.hotkeys"]);

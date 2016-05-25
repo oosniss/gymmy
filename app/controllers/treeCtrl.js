@@ -10,7 +10,6 @@ angular.module("treeCtrl", [])
 
         // keep track of tree navigation
         $scope.node = {
-            initialized: false,
             depth: 0,
             current: ["nodeTop"],
             tempValue: null,
@@ -20,6 +19,7 @@ angular.module("treeCtrl", [])
 
         // keep track of class change and editing point
         $scope.$watch(function () {
+            $scope.node.initialized = treeServices.config();
             // update the value for ngClass
             $scope.node.classTarget = _.join($scope.node.current, "");
             // keep track of index number of the current item in the children array
@@ -50,7 +50,6 @@ angular.module("treeCtrl", [])
             treeServices.init(this.topic);
             // create the tree and update the view
             $scope.init();
-            $scope.node.initialized = true;
         };
 
         // update the class for each items
