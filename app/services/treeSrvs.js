@@ -34,7 +34,7 @@ angular.module("treeSrvs", [])
                     name: "CEO"
                 },
                 HTMLid: "nodeTop",
-                children: [/*
+                children: [
                     {
                         text: {name: "Account"},
                         HTMLid: "children0",
@@ -141,7 +141,7 @@ angular.module("treeSrvs", [])
                             }
                         ]
                     }
-                 */]
+                 ]
             }
         };
 

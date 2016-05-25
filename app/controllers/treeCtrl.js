@@ -5,17 +5,26 @@ angular.module("treeCtrl", [])
     })
     .controller("treeController", ["$scope", "hotkeys", "treeServices", "$compile", "$timeout", function ($scope, hotkeys, treeServices, $compile, $timeout) {
 
+        // force focus on the input
+        angular.element(".init > form > input").focus();
+
         // keep track of tree navigation
         $scope.node = {
-            initialized: false,
+            initialized: true,
             depth: 0,
             current: ["nodeTop"],
-            nextCheck: [],
             tempValue: null,
             lastTask: null,
-            classTarget: "nodeTop",
-            mousetrap: true
+            classTarget: "nodeTop"
         };
+
+        // keep track of class change and editing point
+        $scope.$watch(function () {
+            // update the value for ngClass
+            $scope.node.classTarget = _.join($scope.node.current, "");
+            // keep track of index number of the current item in the children array
+            $scope.node.depth = $scope.node.current[$scope.node.current.length - 1];
+        });
 
         // create and refresh the tree
         $scope.init = function () {
@@ -26,7 +35,7 @@ angular.module("treeCtrl", [])
             // recreate the tree with updated information
             $scope.chart_config = treeServices.tree();
             $scope.chart = new Treant($scope.chart_config, function () {
-                // attach ngClass directives to the tree items
+                // attach ngClass directives to each tree item
                 var target = angular.element(".nodeBranches");
                 for (var i = 0; i < target.length; i++) {
                     target.eq(i).attr("ng-class", "changeClass('" + target.eq(i).attr("id") + "')");
@@ -35,57 +44,69 @@ angular.module("treeCtrl", [])
             });
         };
 
-        // set the main topic of the tree
+        // set the main topic for the tree
         $scope.setTopic = function () {
+            // set the value for the top item
             treeServices.init(this.topic);
-            // update the view
+            // create the tree and update the view
             $scope.init();
             $scope.node.initialized = true;
         };
-
-        // keep track of class change and editing point
-        $scope.$watch(function () {
-            // update the value for ngClass
-            $scope.node.classTarget = _.join($scope.node.current, "");
-            // keep track of how deep the current item is
-            $scope.node.depth = $scope.node.current[$scope.node.current.length-1];
-        });
 
         // update the class for each items
         $scope.changeClass = function (newValue) {
             return $scope.node.classTarget == newValue ? "active" : "";
         };
 
+        // receive the value from the form via ng-submit and edit the current item
+        $scope.editNode = function () {
+            // receive the new value for the field that is being edited
+            treeServices.edit($scope.node.current, this.edited);
+            // refresh the tree and empty the input field
+            $scope.init();
+            this.edited = "";
+        };
+
+        // receive the value from the form via ng-submit and create a new item in the tree
+        $scope.newNode = function () {
+            // empty the field used to receive the new value and set the text value
+            treeServices.set($scope.node.current, this.inserted);
+            // refresh the tree and empty the input
+            $scope.init();
+            this.inserted = "";
+        };
+
         // go down one level
         hotkeys.add({
             combo: 'down',
-            callback: function() {
+            description: "Move down",
+            callback: function () {
                 // always go down to the first item in the next level
                 $scope.node.depth = 0;
-
                 // store the value to check if the tree has the next item
                 var nextCheck = _.take($scope.node.current, $scope.node.current.length);
-
+                // if the current item is the top item
                 if ($scope.node.current[0] == "nodeTop") {
-                    // if the current item is the top item
+                    // remove "nodeTop" and insert "children" and "0"
                     nextCheck.splice(0, 1, "children", $scope.node.depth);
                 } else {
+                    // if not, keep inserting "children" and "0"
                     nextCheck.push("children", $scope.node.depth);
                 }
-
-                // if the tree has the next item, move to the next item.
+                // update the current item only if the tree has the next item
                 if (_.has($scope.chart_config.nodeStructure, nextCheck)) {
                     $scope.node.current = nextCheck;
                 }
             }
         });
-
+        
         // go up one level
         hotkeys.add({
             combo: 'up',
+            description: "Move up",
             callback: function() {
-                // go up one level only when the top item has children
                 if ($scope.node.current.length > 2) {
+                    // go up one level only when the top item has children
                     $scope.node.current.splice($scope.node.current.length - 2, 2);
                 } else {
                     // if not, reset to default
@@ -98,10 +119,10 @@ angular.module("treeCtrl", [])
         // go right one level
         hotkeys.add({
             combo: 'right',
+            description: "Move right",
             callback: function() {
                 // store the value to check if the tree has the next item
                 var nextCheck = _.take($scope.node.current, $scope.node.current.length);
-
                 // go up one level only when the top item has children
                 if ($scope.node.current.length >= 2) {
                     // increment the depth value to move to the next children
@@ -117,6 +138,7 @@ angular.module("treeCtrl", [])
         // go left one level
         hotkeys.add({
             combo: 'left',
+            description: "Move left",
             callback: function() {
                 // move to the previous children
                 // only when the current item is not the first children or the top item
@@ -128,6 +150,7 @@ angular.module("treeCtrl", [])
         });
         hotkeys.add({
             combo: "del",
+            description: "Delete the current item",
             callback: function () {
                 // delete the current item and all of its children
                 treeServices.delete(_.take($scope.node.current, $scope.node.current.length - 1), $scope.node.current[$scope.node.current.length - 1]);
@@ -141,59 +164,63 @@ angular.module("treeCtrl", [])
         // Edit the current node
         hotkeys.add({
             combo: "e",
+            description: "Edit the current item",
             callback: function () {
+                // specify which task was run for "esc" hotkey function
                 $scope.node.lastTask = "edit";
                 var editField = angular.element(".active");
+                // store the value of the current item to return to when "esc" was pressed
                 $scope.node.tempValue = editField.children().text();
+                // empty the current item and insert the form
                 editField.empty();
                 var newField = "<form ng-submit='editNode()'><input class='editNode' type='text' ng-model='edited'></form>";
                 editField.append(newField);
+                // force the focus on the form
                 $timeout(function () {
                     angular.element(".editNode").focus();
                 }, 1);
+                // compile the new form
                 $compile(editField)($scope);
             }
         });
-        $scope.editNode = function () {
-            treeServices.edit($scope.node.current, this.edited);
-            $scope.init();
-            this.edited = "";
-        };
 
-        // Insert a new node for the current node
+        // Insert a new children for the current item
         hotkeys.add({
             combo: "n",
             callback: function () {
+                // specify which task was ran for "esc" hotkey function
                 $scope.node.lastTask = "insert";
+                // create a new item with a form to enter the value for the new item
                 treeServices.push("<form ng-submit='newNode()'><input class='editNode' type='text' ng-model='inserted'></form>", $scope.node.current);
+                // force the focus on the form
                 $timeout(function () {
                     angular.element(".editNode").focus();
                 }, 1);
+                // refresh the tree with the new item
                 $scope.init();
             }
         });
-        $scope.newNode = function () {
-            treeServices.set($scope.node.current, this.inserted);
-            $scope.init();
-            this.inserted = "";
-        };
+
         hotkeys.add({
             combo: "esc",
+            allowIn: ['INPUT'],
             callback: function () {
-                if ($scope.node.mousetrap) {
-                    if ($scope.node.lastTask == "edit") {
-                        treeServices.edit($scope.node.current, $scope.node.tempValue);
-                    } else if ($scope.node.lastTask == "insert") {
-                        treeServices.delete(_.take($scope.node.current, $scope.node.current.length-1), $scope.node.current[$scope.node.current.length-1]);
-                        if ($scope.node.current.length == 2) {
-                            $scope.node.current = ["nodeTop"];
-                        } else {
-                            $scope.node.current.splice(-2, 2);
-                        }
+                if ($scope.node.lastTask == "edit") {
+                    // if the user is editing an item, restore the original value
+                    treeServices.edit($scope.node.current, $scope.node.tempValue);
+                } else if ($scope.node.lastTask == "insert") {
+                    // if the user is inserting a new item, delete the form and the item
+                    treeServices.delete(_.take($scope.node.current, $scope.node.current.length-1), $scope.node.current[$scope.node.current.length-1]);
+                    // resetting back to default
+                    if ($scope.node.current.length == 2) {
+                        $scope.node.current = ["nodeTop"];
+                    } else {
+                        $scope.node.current.splice(-2, 2);
                     }
-                    $scope.init();
-                    this.edited = "";
                 }
+                // refresh the tree
+                $scope.init();
+                this.edited = "";
             }
         });
     }]);
