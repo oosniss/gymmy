@@ -1,1 +1,161 @@
-@import url(https://fonts.googleapis.com/css?family=Cinzel:400,700,900);body,header h1{font-family:Cinzel,serif}.init form,.init form input,header{text-align:center}*{box-sizing:border-box}body{background:#4d637b;color:#39496b;font-size:16px}h1,h2,h3,h4,h5,h6,p{margin:0;padding:0}.init{background:#39496b;padding-top:200px;position:absolute;width:100%;height:100%;z-index:99}.init form input,aside{background:#e3eaf2}.init form label{color:#fff;display:block;font-weight:900;font-size:4.5em;margin-bottom:100px}.init form input{padding:10px;border:0;height:100px;width:60%;font-size:3em}header{background-color:#39496b;color:#e3eaf2;padding:25px 0}header h1{font-size:4em;font-weight:900}header h1 i{margin:0 25px}header .fa-question-circle{float:right;font-size:3em}aside div.instructions{margin:0 auto;padding:10px}aside div.instructions table{font-family:Cinzel,serif;font-weight:700;margin:0 auto;width:100%}aside div.instructions table img{height:50px}main{padding:10px}main .chart{background:#fff;height:70vh}main .chart #nodeTop{font-size:1.5em}main .chart .node.nodeBranches{background:#e3eaf2;border:5px solid #e3eaf2;border-radius:2px;box-shadow:2.5px 2.5px 2.5px rgba(57,73,107,.5);cursor:pointer}main .chart .node.nodeBranches:hover .node-name{color:#39496b;font-weight:700;text-shadow:2.5px 2.5px 2.5px rgba(57,73,107,.15)}main .chart .node.nodeBranches .node-name{padding:7.5px}main .chart .node.nodeBranches .collapse-switch{border:0;width:100%;height:100%}main .chart .node.nodeBranches .editNode{text-align:center;background:0 0;border:0;height:40px}.init form input:focus,main .chart .node.nodeBranches .editNode:focus{outline-width:0}main .chart .collapsed .collapse-switch{background:0}main .chart .active{border:5px solid #222b40!important}main .chart .active .node-name{color:#000!important;font-weight:900!important}
+@import url(https://fonts.googleapis.com/css?family=Cinzel:400,700,900);
+/* line 3, ../../app/sass/main.scss */
+* {
+  box-sizing: border-box;
+}
+
+/* line 6, ../../app/sass/main.scss */
+body {
+  background: #4D637B;
+  color: #39496B;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+}
+
+/* line 12, ../../app/sass/main.scss */
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+  padding: 0;
+}
+
+/* line 17, ../../app/sass/main.scss */
+.init {
+  background: #39496B;
+  padding-top: 200px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
+}
+/* line 24, ../../app/sass/main.scss */
+.init form {
+  text-align: center;
+}
+/* line 26, ../../app/sass/main.scss */
+.init form label {
+  color: #ffffff;
+  display: block;
+  font-weight: 900;
+  font-size: 4.5em;
+  margin-bottom: 100px;
+}
+/* line 33, ../../app/sass/main.scss */
+.init form input {
+  background: #E3EAF2;
+  padding: 10px;
+  text-align: center;
+  border: none;
+  height: 100px;
+  width: 60%;
+  font-size: 3em;
+}
+/* line 41, ../../app/sass/main.scss */
+.init form input:focus {
+  outline-width: 0;
+}
+
+/* line 47, ../../app/sass/main.scss */
+header {
+  background-color: #39496B;
+  color: #E3EAF2;
+  padding: 25px 0;
+  text-align: center;
+}
+/* line 52, ../../app/sass/main.scss */
+header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 4em;
+  font-weight: 900;
+}
+/* line 56, ../../app/sass/main.scss */
+header h1 i {
+  margin: 0 25px;
+}
+/* line 60, ../../app/sass/main.scss */
+header .fa-question-circle {
+  float: right;
+  font-size: 3em;
+}
+
+/* line 65, ../../app/sass/main.scss */
+aside {
+  background: #E3EAF2;
+}
+/* line 67, ../../app/sass/main.scss */
+aside div.instructions {
+  margin: 0 auto;
+  padding: 10px;
+}
+/* line 70, ../../app/sass/main.scss */
+aside div.instructions table {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  margin: 0 auto;
+  width: 100%;
+}
+/* line 75, ../../app/sass/main.scss */
+aside div.instructions table img {
+  height: 50px;
+}
+
+/* line 81, ../../app/sass/main.scss */
+main {
+  padding: 10px;
+}
+/* line 83, ../../app/sass/main.scss */
+main .chart {
+  background: #ffffff;
+  height: 70vh;
+}
+/* line 86, ../../app/sass/main.scss */
+main .chart #nodeTop {
+  font-size: 1.5em;
+}
+/* line 89, ../../app/sass/main.scss */
+main .chart .node.nodeBranches {
+  background: #E3EAF2;
+  border: 5px solid #E3EAF2;
+  border-radius: 2px;
+  box-shadow: 2.5px 2.5px 2.5px rgba(57, 73, 107, 0.5);
+  cursor: pointer;
+}
+/* line 95, ../../app/sass/main.scss */
+main .chart .node.nodeBranches:hover .node-name {
+  color: #39496B;
+  font-weight: 700;
+  text-shadow: 2.5px 2.5px 2.5px rgba(57, 73, 107, 0.15);
+}
+/* line 100, ../../app/sass/main.scss */
+main .chart .node.nodeBranches .node-name {
+  padding: 7.5px;
+}
+/* line 103, ../../app/sass/main.scss */
+main .chart .node.nodeBranches .collapse-switch {
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+/* line 108, ../../app/sass/main.scss */
+main .chart .node.nodeBranches .editNode {
+  text-align: center;
+  background: transparent;
+  border: none;
+  height: 40px;
+}
+/* line 113, ../../app/sass/main.scss */
+main .chart .node.nodeBranches .editNode:focus {
+  outline-width: 0;
+}
+/* line 119, ../../app/sass/main.scss */
+main .chart .collapsed .collapse-switch {
+  background: none;
+}
+/* line 123, ../../app/sass/main.scss */
+main .chart .active {
+  border: 5px solid #222B40 !important;
+}
+/* line 125, ../../app/sass/main.scss */
+main .chart .active .node-name {
+  color: black !important;
+  font-weight: 900 !important;
+}
